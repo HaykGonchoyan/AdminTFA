@@ -1,6 +1,7 @@
 import "./index.css"
 
 import React, {useState} from "react"
+import { useAuth } from "../../context/auth.js"
 import {signInWithEmailAndPassword} from "firebase/auth"
 import {auth, db} from "../../firebase.js"
 
@@ -10,15 +11,18 @@ const Login = () => {
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
 
-    const handleSignIn = async () => {
-        setEmail(document.getElementById("loginEmail"))
-        setPassword(document.getElementById("loginPassword"))
+    const {login} = useAuth()
+
+    const handleSignIn = async (e) => {
+        e.preventDefault()
         try {
-            await signInWithEmailAndPassword(auth, email, password)
+            setError("")
+            await login(email, password)
             setEmail("")
             setPassword("")
         } catch (err) {
             setError(err.message.replace("Firebase: ", ""))
+            console.log(error)
         }
     }
 
@@ -26,8 +30,22 @@ const Login = () => {
         <div className="login-page">
             <div className="login-container">
                 <div className="login-container-header">Login to admin panel</div>
-                <input className="login-input" id="loginEmail" placeholder="Email"></input>
-                <input className="login-input" id="loginPassword" placeholder="Password" type="password"></input>
+                <input
+                    className="login-input"
+                    id="loginEmail"
+                    placeholder="Email"
+                    onChange={(e) => {setEmail(e.target.value)}}
+                    required />
+
+                <input
+                    className="login-input"
+                    id="loginPassword"
+                    placeholder="Password"
+                    type="password"
+                    onChange={(e) => {setPassword(e.target.value)}}
+                    required
+                />
+
                 <div className="login-button" onClick={handleSignIn}>Login</div>
             </div>
         </div>
